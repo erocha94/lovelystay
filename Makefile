@@ -13,3 +13,15 @@ stop:
 .PHONY: enter
 enter:
 	@docker-compose run --rm node bash
+
+.PHONY: test
+test:
+	@docker-compose run --rm node npm test
+
+.PHONY: lint
+lint:
+	@docker-compose run --rm node npx eslint .
+
+.PHONY: lint-fix
+lint-fix:
+	@docker-compose run --rm node npx eslint --fix .

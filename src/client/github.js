@@ -1,7 +1,7 @@
 'use strict'
 
 const R = require('ramda')
-const { request } = require('../../lib/http/client')
+const client = require('../../lib/http/client')
 const DEFAULT = {
   baseURL: 'https://api.github.com',
   method: 'GET',
@@ -33,19 +33,19 @@ const handleError = e => {
 module.exports = {
   fetchUser(username) {
     const cfg = { ...DEFAULT, url: `/users/${username}` }
-    return request(cfg)
+    return client.do(cfg)
       .then(mapUser)
       .catch(handleError)
   },
   fetchRepos(username) {
     const cfg = { ...DEFAULT, url: `/users/${username}/repos` }
-    return request(cfg)
+    return client.do(cfg)
       .then(mapRepositories)
       .catch(handleError)
   },
   fetchLanguages(username, repo) {
     const cfg = { ...DEFAULT, url: `/repos/${username}/${repo}/languages` }
-    return request(cfg)
+    return client.do(cfg)
       .then(mapLanguages)
       .catch(handleError)
   },

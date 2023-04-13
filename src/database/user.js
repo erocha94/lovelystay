@@ -5,12 +5,11 @@ const ctx = require('../context')
 
 module.exports = {
   findBy(params) {
-    params = R.pick(['location', 'language'], params)
-  
     let join = ''
     const where = []
     const values = []
-    if (params.language) {
+
+    if (params?.language) {
       join += `
         LEFT JOIN repositories r ON r.user_id = u.id
         LEFT JOIN repository_languages rl ON rl.repository_id = r.id
@@ -20,7 +19,7 @@ module.exports = {
       values.push(params.language)
     }
   
-    if (params.location) {
+    if (params?.location) {
       where.push(`LOWER(u.location) LIKE LOWER($${where.length + 1})`)
       values.push(`%${params.location}%`)
     }
@@ -28,11 +27,12 @@ module.exports = {
     const stmt = `
       SELECT u.* FROM users u
       ${join}
-      ${where.length ? `WHERE ` + where.join(' AND ') : '' }
+      ${where.length ? `WHERE ${where.join(' AND ')}` : '' }
+      GROUP BY u.id
     `
   
     return ctx.connection
-      .result(stmt, values)
+      .result(stmt.trim(), values)
       .then(R.prop('rows'))
   },
 

@@ -28,6 +28,18 @@ Your goal is to develop a command-line application using NodeJS + TypeScript (or
 
 - Docker installation
 
+## Makefile
+
+| Command | Context | Description |
+|---------|---------|-------------|
+| enter | development | Execute shell in app container |
+| env | development | Start database container |
+| install | development | Download project dependencies |
+| stop | development | Stop any running applications' containers |
+| lint | quality | Run linter |
+| lint-fix | quality | Fix linting issues |
+| test | quality | Run all application tests |
+
 ## Step by step
 
 1. Duplicate `.env.example` to `.env` and edit if needed (the default values should work)
@@ -52,10 +64,15 @@ make enter
 
 From here you will have the necessary conditions to execute the application
 
+- Running unit tests
+```bash
+make test
+```
+
 ## Fetching a user
 
 ```bash
-node index.js --fetch <username>
+./index.js --fetch <username>
 ```
 
 Fetches a user from the github API and saves it on the database.
@@ -63,7 +80,7 @@ Fetches a user from the github API and saves it on the database.
 ## Showing users
 
 ```bash
-node index.js --show [--filter key=value]
+./index.js --show [--filter key=value]
 ```
 
 Displays all users that were saved on the database.

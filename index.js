@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict'
 
 const logger = require('./lib/logger')
@@ -18,7 +19,7 @@ const { fetch: username, show, filter } = cmd
 
   logger.debug('Connecting to database')
   await Promise.all([
-    db.init(),
+    db.connect(),
     db.migrate.up(),
   ])
 

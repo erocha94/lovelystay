@@ -2,12 +2,7 @@
 
 const ctx = require('./context')
 
-const {
-  fetchUser,
-  fetchRepos,
-  fetchLanguages
-} = require('./client/github')
-
+const github = require('./client/github')
 const userRepository = require('./repository/user')
 
 const refresh = async username => {
@@ -16,8 +11,8 @@ const refresh = async username => {
   }
 
   const [user, repos] = await Promise.all([
-    fetchUser(username),
-    fetchRepos(username),
+    github.fetchUser(username),
+    github.fetchRepos(username),
   ])
   
   if (!user) {
@@ -25,7 +20,7 @@ const refresh = async username => {
   }
 
   await Promise.all(repos.map(async repo => {
-    repo.languages = await fetchLanguages(username, repo.name)
+    repo.languages = await github.fetchLanguages(username, repo.name)
   }))
 
   user.repos = repos

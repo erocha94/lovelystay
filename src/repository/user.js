@@ -3,41 +3,44 @@
 const R = require('ramda')
 const ctx = require('../context')
 
-const {
-  findBy,
-  save: saveUser,
-} = require('../database/user')
+const users = require('../database/user')
+const repositories = require('../database/repo')
+const languages = require('../database/language')
+const repoLanguages = require('../database/repo-language')
 
-const {
-  save: saveRepo
-} = require('../database/repo')
-
-const {
-  save: saveLanguage
-} = require('../database/language')
-
-const {
-  save: saveRepoLanguage
-} = require('../database/repo-language')
+const saveLanguages = R.map(languages.save)
+const saveUser = R.compose(
+  R.andThen(R.prop('id')),
+  users.save
+)
+const saveRepository = R.compose(
+  R.andThen(R.prop('id')),
+  repositories.save
+)
+const saveRepoLanguage = R.useWith(repoLanguages.save, [
+  R.identity,
+  R.prop('id')
+])
 
 const save = dto => {
   return ctx.transaction(async () => {
     const user = R.omit(['repos'], dto)
     const repos = dto.repos ?? []
-  
-    const userID = await saveUser(user).then(R.prop('id'))
+
+    const userID = await saveUser(user)
     await Promise.all(repos.map(async repo => {
-      const[repoID, ...languages] = await Promise.all([
-        saveRepo(userID, repo).then(R.prop('id')),
-        ...R.map(saveLanguage, repo.languages),
+      const results = await Promise.all([
+        saveRepository(userID, repo),
+        ...saveLanguages(repo.languages),
       ])
-  
-      await Promise.all(R.map(l => saveRepoLanguage(repoID, l.id), languages))
+
+      const repoID = results.shift()
+      await Promise.all(R.map(saveRepoLanguage(repoID), results))
     }))
   })
 }
 
 module.exports = {
-  findBy,
+  findBy: users.findBy,
   save,
 }
